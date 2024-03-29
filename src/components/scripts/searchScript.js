@@ -29,7 +29,7 @@ export const searchScript = {
       visibleInfoSell: false, 
       visibleInfoItem: false,
       currentItem: null,
-      visibleModal: true,
+      visibleModal: false,
       isVisibleContent: true,
       isModalVisible: false,
       inputValue: null, 
@@ -111,8 +111,6 @@ export const searchScript = {
         thirdUpQuantity: '',
       },
       components: [
-        ['0', 'Tactical SMG', '$ 987.587.666', 'ezeQel', '03:00:00', '[Кухня Гурмана] Кладовщик', ['conditionItem', 'conditionItem', 'conditionItem', 'conditionItem'], [85, 100, 74, 31], [], 'Вооружение', 'Пистолет'],
-        ['1', 'Navy Revolver', '$ 187.527.636', 'Stas', '03:25:00', '[Кухня Гурмана] Кладовщик', [], [], ['itemForMainItem'], 'Одежда', 'Шапки'],
       ],
       lots: [
         ['0', 'Tactical SMG', '$ 987.587.666', '03:00:00', []],
@@ -300,18 +298,27 @@ export const searchScript = {
     });
     return timers;
   },
-    startTimers() {
-      this.slotTimers.forEach((timer, index) => {
+  startTimers() {
+    this.slotTimers.forEach((timer, index) => {
         const interval = setInterval(() => {
-          if (timer.time > 0) {
-            this.slotTimers[index].time--;
-          } else {
-            clearInterval(interval);
-            this.slotTimers[index].expired = true;
-          }
+            if (timer.time > 0) {
+                this.slotTimers[index].time--;
+            } else {
+                clearInterval(interval);
+                this.slotTimers[index].expired = true;
+            }
         }, 1000);
+        timer.interval = interval;
       });
-    }, 
+    },
+
+    stopTimers() {
+      this.slotTimers.forEach((timer, index) => {
+          clearInterval(timer.interval);
+          this.slotTimers[index].expired = true;
+      });
+  },
+
       formatTime(seconds) {
       const hours = Math.floor(seconds / 3600);
       const minutes = Math.floor((seconds % 3600) / 60);
@@ -335,11 +342,14 @@ export const searchScript = {
       return checked;
     },
     closeMainWindow() {
-      if(!this.isModalVisible){
-        this.isVisibleContent = false;
-      }   
+        if (!this.isModalVisible) {
+          this.isVisibleContent = false;
+        }
+          this.isModalVisible = false;
+          executeClient('announceboard.board.pressClose');
     },
     toggleModal(imagePath, id) {
+      console.log(`toggleModal: ${imagePath}, ${id}`)
       this.selectedImage = imagePath;
       this.selectedId = id;
       this.isModalVisible = true;
@@ -395,18 +405,16 @@ export const searchScript = {
     executeClient('requestBackendData');
   },
 
-  handleKeydown(e) {
-    console.log("Нажата клавиша:", e.key);
-    if (e.key === "E" || e.key === "e") {
-      this.openMainWindow();
-    }
-  },
+  handleKeydown(status) {
+    this.isVisibleContent = status;
+},
 
-  openMainWindow() {
-    this.isVisibleContent = true;
-  },
+  // openMainWindow() {
+  //   this.isVisibleContent = true;
+  // },
 
   updateComponents(newComponents) {
+    this.stopTimers();
     this.components = newComponents;
     this.slotTimers = this.initializeTimers(newComponents);
     this.startTimers();
@@ -416,11 +424,18 @@ export const searchScript = {
     this.lots = newLots;
   },
 
+  // sendPurchaseConfirmation() {
+  //   const purchaseData = { id: this.selectedId }; 
+  //   executeClient('sendPurchaseConfirmation', JSON.stringify(purchaseData));
+  //   this.closeModal();
+  // },
+
   sendPurchaseConfirmation() {
-    const purchaseData = { id: this.selectedId }; 
-    executeClient('sendPurchaseConfirmation', JSON.stringify(purchaseData));
+    const purchaseData = {id: this.components[this.selectedId][12]};
+    //console.log(`sendPurchaseConfirmation: ${JSON.stringify(purchaseData)}`)
+    executeClient('announceboard.board.buyItem', JSON.stringify(purchaseData));
     this.closeModal();
-  },
+},
 
   sendRemoveConfirmation(id) {
     this.chosenId = id;
@@ -428,26 +443,27 @@ export const searchScript = {
     executeClient('sendRemoveConfirmation', JSON.stringify(removeData));
   },
 
-  sellItem() {
+  sendSellItem() {
+
     if (!this.currentItem || !this.currentItem.id) {
-      alert("Выберите товар для продажи.");
-      return;
+        alert("Выберите товар для продажи.");
+        return;
     }
 
     const payload = {
-      id: this.currentItem.id,
-      price: this.inputValue,
-      comment: this.commentValue, 
+        id: this.currentItem.ItemUID,
+        price: this.inputValue,
+        comment: this.commentValue,
     };
-
+    //console.log(`sendSellItem: ${JSON.stringify(payload)}`)
     const payloadString = JSON.stringify(payload);
 
-    executeClient('sellItem', payloadString);
+    executeClient('announceboard.board.sellItem', payloadString);
 
     setTimeout(() => {
-      this.fetchDataFromBackend();
+        this.fetchDataFromBackend();
     }, 1000);
-  },
+},
 
   changeItem() {
     if (!this.changedValue) {
@@ -477,51 +493,103 @@ export const searchScript = {
     executeClient('requestItemDetails', JSON.stringify({ id: item.id }));
   },
 
-  getImagePath(imageName) {
-    const sanitizedImageName = imageName.replace(/[^a-zA-Z0-9]/g, '');
-    return require(`../assets/png/${sanitizedImageName}.png`);
+  getImagePath(itemUID) {
+    //console.log(`getImagePath: ${JSON.stringify(itemUID)}`)
+    //const sanitizedImageName = imageName.replace(/[^a-zA-Z0-9]/g, '');
+    //return require(`../assets/png/${sanitizedImageName}.png`);
+    let _component = this.components.find(component => {
+        return component[12] === itemUID;
+    });
+    //_component = JSON.stringify(_component)
+    //console.log(this.imgURL + _component[12] + '.png')
+    return this.imgURL + _component[11] + '.png'
+  },
+  getImagePathChild(itemID) {
+    //console.log(`getImagePathChild: ${JSON.stringify(itemID)}`)
+    //const sanitizedImageName = imageName.replace(/[^a-zA-Z0-9]/g, '');
+    //return require(`../assets/png/${sanitizedImageName}.png`);
+
+    //_component = JSON.stringify(_component)
+    //console.log(this.imgURL + _component[12] + '.png')
+    return this.imgURL + itemID + '.png'
   },
 },
 
   mounted() {
-    this.fetchDataFromBackend();
-
+    window.events.addEvent('sendPurchaseConfirmation', this.sendPurchaseConfirmation)
     window.events.addEvent('receiveBackendData', (data) => {
       try {
-        const newComponents = JSON.parse(data);
-        this.updateComponents(newComponents);
-      } catch (error) {
-        console.error('Ошибка при обработке данных:', error);
-      }
-    });
+          let _datas = JSON.parse(data)
 
-    window.events.addEvent('getLots', (data) => {
-      try {
-        const newLots = JSON.parse(data);
-        this.updateLots(newLots);
-      }
-      catch (error) {
-        console.error('Ошибка при обработке данных:', error);
-      }
-    });
 
-    window.addEventListener('keydown', (e) => this.handleKeydown(e));
-
-    window.events.addEvent('receiveItemDetails', (data) => {
-      try {
-        const itemDetails = JSON.parse(data);
-        const index = this.items.findIndex(item => item.id === itemDetails.id);
-        if (index !== -1) {
-          this.$set(this.items, index, {
-            ...this.items[index],
-            ...itemDetails
+          const newComponents = _datas.map((data, index) => {
+              return [
+                  (index).toString(),
+                  data.Name,
+                  `$ ${data.Price}`,
+                  data.Owner,
+                  data.SellTime,
+                  `${data.Location} ${data.NpcName}`,
+                  data.Conditions.map(condition => condition.name),
+                  data.Conditions.map(condition => condition.percent),
+                  data.SubItems,
+                  data.Category.Name,
+                  data.Category.SubCategories.join(', '),
+                  data.ItemId,
+                  data.ItemUID
+              ];
           });
-        }
+          this.updateComponents(newComponents);
       } catch (error) {
-        console.error('Ошибка при обработке данных предмета:', error);
+          console.error('Ошибка при обработке данных:', error);
       }
-    });
+  });
 
+
+
+  window.events.addEvent('getLots', (data) => {
+    try {
+        
+        let _datas = JSON.parse(data)
+
+        const newLots = _datas.map((data, index) => {
+            return [
+                (index).toString(),
+                data.Name,
+                `$ ${data.Price}`,
+                data.SellTime,
+                data.SubItems,
+                data.ItemId,
+                data.ItemUID
+            ];
+        });
+        this.updateLots(newLots);
+    } catch (error) {
+        console.error('Ошибка при обработке данных:', error);
+    }
+});
+
+    window.events.addEvent('receiveItemDetails', (_data) => {
+      try {
+          let data = JSON.parse(_data);
+          let _items = [];
+          let _index = 1;
+          data.forEach(element => {
+              _items.push({id: _index++, nameItem: element.Name, categoryItem: element.Category, ItemId: element.ItemId, ItemUID: element.ItemUID})
+          })
+          _items.forEach(item => {
+              const index = this.items.findIndex(existingItem => existingItem.id === item.id);
+              if (index !== -1) {
+                  this.$set(this.items, index, {
+                      ...this.items[index],
+                      ...item
+                  });
+              }
+          });
+      } catch (error) {
+          console.error('Ошибка при обработке данных предмета:', error);
+      }
+  });
   },
 
 };

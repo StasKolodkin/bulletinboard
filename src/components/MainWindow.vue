@@ -48,6 +48,15 @@
   },
   methods: {
     ...searchScript.methods,
-}
+},
+
+mounted() {
+    this.fetchDataFromBackend();
+    //window.addEventListener('keypress', (e) => {this.closeMainWindow(e)})
+
+    window.events.addEvent('visibleStatus', (status) => {
+      this.handleKeydown(status)
+    });
+  }
 }
 </script>

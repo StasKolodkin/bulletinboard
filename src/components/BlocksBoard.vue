@@ -78,29 +78,31 @@
             <span>Категории предметов</span>
           </div>
 
-  <div class="listCategories">
-    <div class="blockCategory" v-for="(category, index) in categories" :key="index">
-      <div class="lineCategory">
-        <div class="checkMark" @click="toggleCheckMark(category)">
-        <div class="clickMark" v-show="category.checked"></div>
-      </div>
-        <span>{{ category.name }}</span>
-      <div class="watchList" @click="toggleSubcategories(category)">
-    <div class="clickList" :style="getClipPath(category.isOpen)" v-if="category.subcategories && category.subcategories.length"></div>
-  </div>
+          <div class="listCategories">
+            <div class="blockCategory" v-for="(category, index) in categories" :key="index">
+              <div class="lineCategory">
+                <div class="checkMark" @click="toggleCheckMark(category)">
+                  <div class="clickMark" v-show="category.checked"></div>
+                </div>
+                <span>{{ category.name }}</span>
+                <div class="watchList" @click="toggleSubcategories(category)">
+                  <div class="clickList" :style="getClipPath(category.isOpen)"
+                       v-if="category.subcategories && category.subcategories.length"></div>
+                </div>
 
 
-    </div>
-    <div v-if="category.isOpen">
-      <div class="lineSubcategory" v-for="(subcategory, subIndex) in category.subcategories" :key="`subcategory-${subIndex}`">
-        <div class="checkMark" @click.stop="toggleSubcategoryCheckMark(subcategory, category)">
-          <div class="clickMark" v-show="subcategory.checked"></div>
-        </div>
-        <span>{{ subcategory.name }}</span>
-      </div>
-    </div>
-  </div>
-</div>
+              </div>
+              <div v-if="category.isOpen">
+                <div class="lineSubcategory" v-for="(subcategory, subIndex) in category.subcategories"
+                     :key="`subcategory-${subIndex}`">
+                  <div class="checkMark" @click.stop="toggleSubcategoryCheckMark(subcategory, category)">
+                    <div class="clickMark" v-show="subcategory.checked"></div>
+                  </div>
+                  <span>{{ subcategory.name }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
 
         </div>
@@ -112,12 +114,7 @@
         <div class="titleBoard">
           <span>ДОСКА<br>ОБЪЯВЛЕНИЙ</span>
         </div>
-        <!-- <div class="textTitle">
-        <div class="warror">
-          <img src="./assets/svg/warror.svg">
-        </div>
-          <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo co</span>
-        </div> -->
+
         <div class="buttonsWrapper">
           <div class="selling" @click="notifyParentForSale">
             <button class="sellingButton">
@@ -147,102 +144,106 @@
           </div>
         </div>
         <div class="slot">
-        <div v-for="(component, index) in filteredComponents" :key="index">
-          <div class="actualSlot" @click="toggleModal(getImagePath(component[1]), component[0])">
-            <div class="lineSlot">
-            <div class="nameZone">
-              <div class="picItem">
-                <img :src="getImagePath(component[1])">
-              </div>
-              <div class="infoItem">
-                <span>{{ component[1] }}</span>
-                <div class="setItems">
-                  <div v-for="(imageName, imgIndex) in component[8]" :key="imgIndex" class="setItem">
-                    <img :src="require(`./assets/png/${imageName}.png`)">
+          <div v-for="(component, index) in filteredComponents" :key="index">
+            <div class="actualSlot" @click="toggleModal(getImagePath(component[12]), component[0])">
+              <div class="lineSlot">
+                <div class="nameZone">
+                  <div class="picItem">
+                    <img :src="getImagePath(component[12])">
+                  </div>
+                  <div class="infoItem">
+                    <span>{{ component[1] }}</span>
+                    <div class="setItems">
+                      <div v-for="(imageName, imgIndex) in component[8]" :key="imgIndex" class="setItem">
+                        <img :src="getImagePathChild(imageName)">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="countZone">
+                  <span>{{ component[2] }}</span>
+                </div>
+                <div class="remainingTimeZone">
+                  <div class="infoRemainingTimeZone">
+                    <div class="userName">
+                      <img src="./assets/svg/userName.svg">
+                      <span>{{ component[3] }}</span>
+                    </div>
+                    <div class="timing">
+                      <img src="./assets/svg/timing.svg">
+                      <span v-if="!slotTimers[component[0]].expired">
+                    {{ formatTime(slotTimers[component[0]].time) }}
+                  </span>
+                      <span v-else>время истекло</span>
+                      <!-- <span>{{ component[4] }}</span> -->
+                    </div>
+                    <div class="location">
+                      <img src="./assets/svg/location.svg">
+                      <span>{{ component[5] }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="specificationsZone">
+                  <div v-for="(percentage, index) in component[7]" :key="index" class="conditionItem">
+                    <img :src="require(`./assets/svg/${component[6][index]}.svg`)">
+                    <span>{{ percentage }}%</span>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="countZone">
-              <span>{{ component[2] }}</span>
-            </div>
-            <div class="remainingTimeZone">
-              <div class="infoRemainingTimeZone">
-                <div class="userName">
-                  <img src="./assets/svg/userName.svg">
-                  <span>{{ component[3] }}</span>
-                </div>
-                <div class="timing">
-                  <img src="./assets/svg/timing.svg">
-                  <span v-if="!slotTimers[component[0]].expired">
-                    {{ formatTime(slotTimers[component[0]].time) }}
-                  </span>
-                  <span v-else>время истекло</span>
-                </div>
-                <div class="location">
-                  <img src="./assets/svg/location.svg">
-                  <span>{{ component[5] }}</span>
-                </div>
-              </div>
-            </div>
-            <div class="specificationsZone">
-              <div v-for="(percentage, index) in component[7]" :key="index" class="conditionItem">
-                <img :src="require(`./assets/svg/${component[6][index]}.svg`)">
-                <span>{{ percentage }}%</span>
-              </div>
-            </div>
           </div>
-        </div>
-        </div>
         </div>
       </div>
       <ModalWindow :isVisible="isModalVisible" :image="selectedImage" :id="selectedId" @close="handleModalClose"></ModalWindow>
+    </div>
   </div>
-</div>
 </template>
 
 <style>
-  @import './style/blocksBoard.css';
-  @import './style/search.css';
-  @import './style/board.css';
+@import './style/blocksBoard.css';
+@import './style/search.css';
+@import './style/board.css';
 </style>
 
 <script>
-  import { searchScript } from './scripts/searchScript.js';
-  import ModalWindow from '@/components/ModalWindow.vue';
-  // import SellingButton from '@/components/SellingWindow.vue'
+import {searchScript} from './scripts/searchScript.js';
+import ModalWindow from '@/components/ModalWindow.vue';
+// import SellingButton from '@/components/SellingWindow.vue'
+import {executeClient} from './scripts/rage.js';
 
-  export default {
-    ...searchScript,
-    components: {
-      ...searchScript.components, 
-      ModalWindow,
-      // SellingButton
-    },
+export default {
+  ...searchScript,
+  components: {
+    ...searchScript.components,
+    ModalWindow,
+    // SellingButton
+  },
 
-    created() {
+  created() {
     const timers = this.initializeTimers();
     this.slotTimers = timers;
     this.startTimers();
   },
 
-    data() {
-      return {
-        ...searchScript.data(),
-      };
-    },
-    methods: {
-      ...searchScript.methods,
+  data() {
+    return {
+      ...searchScript.data(),
+    };
+  },
+  methods: {
+    ...searchScript.methods,
 
     notifyParent() {
-      this.$emit('toggleViewSell'); 
+      this.$emit('toggleViewSell');
+      executeClient('announceboard.board.openSell')
     },
-
     notifyParentForSale() {
       this.$emit('toggleViewSale'); 
+      executeClient('announceboard.board.changeSell')
     }
-    },
-  };
+  },
+
+};
 </script>
 
 

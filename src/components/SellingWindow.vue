@@ -23,7 +23,7 @@
         </div> 
             <div class="itemContent">
               <div class="imgContent">
-                <img v-if="item.nameItem" :src="getImagePath(item.nameItem)">
+                <img v-if="item.nameItem" :src="getImagePathChild(item.ItemId)">
               </div>
             </div>
             <div class="nameItem">
@@ -41,7 +41,7 @@
       <div class="topinfoSelling">
         <div class="leftTop">
           <div class="imgContentTop">
-            <img :src="getImagePath(currentItem.nameItem)">
+            <img :src="getImagePathChild(currentItem.ItemId)">
           </div>
         </div>
         <div class="rightTop">
@@ -110,7 +110,7 @@
       <div class="topinfoSelling">
         <div class="leftTop">
           <div class="imgContentTop">
-            <img :src="getImagePath(currentItem.nameItem)">
+            <img :src="getImagePathChild(currentItem.ItemId)">
           </div>
         </div>
         <div class="rightTop">

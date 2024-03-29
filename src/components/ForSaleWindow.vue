@@ -11,7 +11,8 @@
                             <div class="wrapperLot">
                                 <div class="leftSubBlock">
                                     <div class="imgLot">
-                                        <img :src="getImagePath(lot[1])">
+                                        <!-- <img :src="getImagePath(lot[1])"> -->
+                                        <img :src="getImagePathChild(lot[6])">
                                     </div>
                                     <div class="DownLeftSubBlock">
                                         <span class="nameLot">{{ lot[1] }}</span>
@@ -29,7 +30,7 @@
                                         </div>
                                         <div class="addItems">
                                             <div v-for="(imageName, imgIndex) in lot[4]" :key="imgIndex" class="addItem">
-                                                <img :src="require(`./assets/png/${imageName}.png`)">
+                                                <img :src="getImagePathChild(imageName)">
                                             </div>
                                         </div>
                                     </div>
@@ -49,6 +50,7 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- <div class="blockLot"></div>
                         <div class="blockLot"></div>
                         <div class="blockLot"></div>
                         <div class="blockLot"></div>
@@ -74,8 +76,7 @@
                         <div class="blockLot"></div>
                         <div class="blockLot"></div>
                         <div class="blockLot"></div>
-                        <div class="blockLot"></div>
-                        <div class="blockLot"></div>
+                        <div class="blockLot"></div> -->
                     </div>
                 </div>
             </div>

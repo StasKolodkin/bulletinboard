@@ -13,7 +13,8 @@
               <img :src="image">
           </div>
           <div class="modalButtonBlock">
-              <button class="modalButton" @click="sendPurchaseConfirmation">
+              <!-- <button class="modalButton" @click="sendPurchaseConfirmation"> -->
+              <button class="modalButton" @click="test">
               <span class="modalButtonText">Я уверен в покупке</span>
               </button>
           </div>
@@ -34,6 +35,13 @@
     },
     methods: {
       ...searchScript.methods,
+
+      test(){
+        //executeClient('sendPurchaseConfirmation', JSON.stringify(purchaseData));
+        //console.log(`test: ${searchScript.data().selectedId}`)
+        window.events.callEvent('sendPurchaseConfirmation')
+        this.closeModal();
+      }
     }
   };
   </script>
