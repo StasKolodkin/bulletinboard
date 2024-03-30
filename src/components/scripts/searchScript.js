@@ -298,25 +298,30 @@ export const searchScript = {
     });
     return timers;
   },
-  startTimers() {
-    this.slotTimers.forEach((timer, index) => {
-        const interval = setInterval(() => {
-            if (timer.time > 0) {
-                this.slotTimers[index].time--;
-            } else {
-                clearInterval(interval);
-                this.slotTimers[index].expired = true;
-            }
-        }, 1000);
-        timer.interval = interval;
-      });
-    },
 
-    stopTimers() {
-      this.slotTimers.forEach((timer, index) => {
-          clearInterval(timer.interval);
-          this.slotTimers[index].expired = true;
+  startTimers() {
+    let timerInterval;
+  
+    const updateTimers = () => {
+      this.slotTimers.forEach((timer) => {
+        if (timer.time > 0) {
+          timer.time--;
+        } else {
+          timer.expired = true;
+        }
       });
+    };
+  
+    const startInterval = () => {
+      timerInterval = setInterval(updateTimers, 1000);
+    };
+  
+    const stopInterval = () => {
+      clearInterval(timerInterval);
+    };
+  
+    stopInterval();
+    startInterval();
   },
 
       formatTime(seconds) {
