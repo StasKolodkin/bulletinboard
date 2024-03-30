@@ -171,11 +171,11 @@
                     </div>
                     <div class="timing">
                       <img src="./assets/svg/timing.svg">
-                      <span v-if="!slotTimers[component[0]].expired">
+                      <!-- <span v-if="!slotTimers[component[0]].expired">
                     {{ formatTime(slotTimers[component[0]].time) }}
                   </span>
-                      <span v-else>время истекло</span>
-                      <!-- <span>{{ component[4] }}</span> -->
+                      <span v-else>время истекло</span> -->
+                      <span>{{ component[4] }}</span>
                     </div>
                     <div class="location">
                       <img src="./assets/svg/location.svg">
